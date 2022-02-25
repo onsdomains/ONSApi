@@ -50,14 +50,15 @@ async function getToken(request,response)
 			name:getName,
 			symbol:"ONS",
 			description:getName + " is an ONS name.",
-			image:"",
+			image:"https://service-ons.com/image/" + tokenID,
 			external_url:"https://ons.money/" +  tokenID,
 			attributes:[
 				{
-					trait_type: "Created Date",
-					display_type:"date",
-					value: "Common"
-				},{
+					trait_type: "Domain",
+					display_type:"string",
+					value: ".ons"
+				},
+				{
 					trait_type: "Length",
 					display_type:"number",
 					value: 6
@@ -68,7 +69,7 @@ async function getToken(request,response)
 				},{
 					trait_type: "Expiration Date",
 					display_type:"date",
-					value: +getExpireDate
+					value: + getExpireDate
 				}
 			]
 
