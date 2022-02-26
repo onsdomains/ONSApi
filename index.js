@@ -43,17 +43,14 @@ async function getToken(request,response)
 			attributes:[
 				{
 					trait_type: "Domain",
-					display_type:"string",
 					value: stringSplit[1]
 				},
 				{
 					trait_type: "Length",
-					display_type:"number",
 					value: stringSplit[0].length
 				},{
 					trait_type: "Expiration Date",
-					display_type:"date",
-					value: + getExpireDate
+					value: timeConverter(+getExpireDate)
 				}
 			]
 
@@ -123,4 +120,15 @@ async function getImage(request, response) {
 			})
 	}
 }
-
+function timeConverter(UNIX_timestamp){
+	var a = new Date(UNIX_timestamp * 1000);
+	var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+	var year = a.getFullYear();
+	var month = months[a.getMonth()];
+	var date = a.getDate();
+	var hour = a.getHours();
+	var min = a.getMinutes();
+	var sec = a.getSeconds();
+	var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec ;
+	return time;
+}
