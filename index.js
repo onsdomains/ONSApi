@@ -81,17 +81,17 @@ async function getImage(request, response) {
 		var stringSplit = getName.split(".");
 
 		if (stringSplit[0].length === 1){
-			var fileName = 'bg1.png';
-		}else if (stringSplit[0].length === 2){
-			var fileName = 'bg2.png';
-		}else if (stringSplit[0].length === 3){
-			var fileName = 'bg3.png';
-		}else if (stringSplit[0].length === 4){
-			var fileName = 'bg4.png';
-		}else if (stringSplit[0].length === 5){
-			var fileName = 'bg5.png';
-		}else{
 			var fileName = 'bg6.png';
+		}else if (stringSplit[0].length === 2){
+			var fileName = 'bg5.png';
+		}else if (stringSplit[0].length === 3){
+			var fileName = 'bg4.png';
+		}else if (stringSplit[0].length === 4){
+			var fileName = 'bg3.png';
+		}else if (stringSplit[0].length === 5){
+			var fileName = 'bg2.png';
+		}else{
+			var fileName = 'bg1.png';
 		}
 
 		var imageCaption = getName
