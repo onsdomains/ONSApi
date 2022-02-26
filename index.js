@@ -39,7 +39,7 @@ async function getToken(request,response)
 			symbol:"ONS",
 			description:getName + " is an ONS name.",
 			image:"https://service-ons.com/image/" + tokenID,
-			external_url:"https://ons.money/" +  tokenID,
+			external_url:"https://ons.money/",
 			attributes:[
 				{
 					trait_type: "Domain",
