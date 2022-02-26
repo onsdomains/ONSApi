@@ -18,7 +18,7 @@ var Jimp = require("jimp");
 const ONS = new web3.eth.Contract(abi, "0xFFb32987c496364cd752cB196bFBE01D8D0D7e48");
 const controller = new web3.eth.Contract(ControllerAbi, "0xBd295ab4BC7Cb4BDf4B7558B9d3f18C5Baee0AA5");
 
-app.listen(5000, () => console.log("Server Start at 5000 Port"));
+app.listen(3000, () => console.log("Server Start at 5000 Port"));
 
 app.use(express.static('public'));
 app.use(cors());
@@ -100,12 +100,10 @@ async function getImage(request, response) {
 		Jimp.read(fileName)
 			.then(function (image) {
 				loadedImage = image
-				if (stringSplit[0].length >= 3){
+				if (stringSplit[0].length <= 10){
 					return Jimp.loadFont(Jimp.FONT_SANS_128_WHITE)
-				}else if (stringSplit[0].length >= 15){
-					return Jimp.loadFont(Jimp.FONT_SANS_64_WHITE)
 				}else{
-					return Jimp.loadFont(Jimp.FONT_SANS_32_WHITE)
+					return Jimp.loadFont(Jimp.FONT_SANS_64_WHITE)
 				}
 			})
 			.then(async function (font) {
