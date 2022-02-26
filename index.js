@@ -101,16 +101,16 @@ async function getImage(request, response) {
 			.then(function (image) {
 				loadedImage = image
 				if (stringSplit[0].length >= 3){
-					return Jimp.loadFont(Jimp.FONT_SANS_128_BLACK)
+					return Jimp.loadFont(Jimp.FONT_SANS_128_WHITE)
 				}else if (stringSplit[0].length >= 15){
-					return Jimp.loadFont(Jimp.FONT_SANS_64_BLACK)
+					return Jimp.loadFont(Jimp.FONT_SANS_64_WHITE)
 				}else{
-					return Jimp.loadFont(Jimp.FONT_SANS_32_BLACK)
+					return Jimp.loadFont(Jimp.FONT_SANS_32_WHITE)
 				}
 			})
 			.then(async function (font) {
 				const b64 = await loadedImage
-					.print(font, 80, 800, imageCaption.toString())
+					.print(font, 80, 1200, imageCaption.toString())
 					.getBase64Async(Jimp.MIME_PNG, (res) => console.log(res))
 				response.writeHead(200, {
 					'Content-Type': 'image/png',
