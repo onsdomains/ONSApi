@@ -17,8 +17,8 @@ var Jimp = require("jimp");
 
 const ONS = new web3.eth.Contract(abi, "0xFFb32987c496364cd752cB196bFBE01D8D0D7e48");
 const controller = new web3.eth.Contract(ControllerAbi, "0xBd295ab4BC7Cb4BDf4B7558B9d3f18C5Baee0AA5");
-
-app.listen(3000, () => console.log("Server Start at 5000 Port"));
+const port = 3000;
+app.listen(port, () => console.log("Server Start at ",port," Port"));
 
 app.use(express.static('public'));
 app.use(cors());
@@ -56,7 +56,7 @@ async function getToken(request,response)
 
 
 		};
-		
+
 	}
 	else
 	{
@@ -78,29 +78,32 @@ async function getImage(request, response) {
 		var stringSplit = getName.split(".");
 
 		if (stringSplit[0].length === 1){
-			var fileName = 'bg6.png';
+			var fileName = 'bg/bg6.png';
 		}else if (stringSplit[0].length === 2){
-			var fileName = 'bg5.png';
+			var fileName = 'bg/bg5.png';
 		}else if (stringSplit[0].length === 3){
-			var fileName = 'bg4.png';
+			var fileName = 'bg/bg4.png';
 		}else if (stringSplit[0].length === 4){
-			var fileName = 'bg3.png';
+			var fileName = 'bg/bg3.png';
 		}else if (stringSplit[0].length === 5){
-			var fileName = 'bg2.png';
+			var fileName = 'bg/bg2.png';
 		}else{
-			var fileName = 'bg1.png';
+			var fileName = 'bg/bg1.png';
 		}
 
 		var imageCaption = getName
 		var loadedImage
-
 		Jimp.read(fileName)
 			.then(function (image) {
 				loadedImage = image
-				if (stringSplit[0].length <= 10){
-					return Jimp.loadFont(Jimp.FONT_SANS_128_WHITE)
-				}else{
-					return Jimp.loadFont(Jimp.FONT_SANS_64_WHITE)
+				if (stringSplit[0].length <= 3){
+					return Jimp.loadFont("font/font256.fnt")
+				}else if (stringSplit[0].length <= 13){
+					return Jimp.loadFont("font/font150.fnt")
+				}else if (stringSplit[0].length <= 20){
+					return Jimp.loadFont("font/font120.fnt")
+				}else {
+					return Jimp.loadFont("font/font80.fnt")
 				}
 			})
 			.then(async function (font) {
