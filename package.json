@@ -27,6 +27,7 @@
   },
   "devDependencies": {
     "compress-images": "^2.0.5",
+    "imagemin-pngquant": "^9.0.2",
     "prettier": "2.6.1",
     "web3": "^1.7.0"
   }
