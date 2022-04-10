@@ -15,11 +15,16 @@
   "author": "Aanisha Bhattacharyya",
   "license": "MIT",
   "dependencies": {
+    "compress-images": "^2.0.5",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "fs": "0.0.1-security",
+    "gifsicle": "^5.2.1",
     "heroku": "^7.30.1",
-    "jimp": "^0.16.1"
+    "http": "^0.0.1-security",
+    "imagemin": "^8.0.1",
+    "jimp": "^0.16.1",
+    "pngquant-bin": "^6.0.1"
   },
   "devDependencies": {
     "prettier": "2.6.1",
