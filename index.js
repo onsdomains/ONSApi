@@ -1,6 +1,6 @@
 var fs = require("fs");
 var https = require("https");
-const imageminPngquant = require('imagemin-pngquant')
+const imageminPngquant = require("imagemin-pngquant");
 
 var dataAbi = fs.readFileSync("abi/contract.json");
 const abi = JSON.parse(dataAbi);
@@ -153,11 +153,15 @@ async function getImage(request, response) {
                       response.writeHead(200, {
                         "Content-Type": "image/png",
                       });
-                      var base64Data = b64.replace(/^data:image\/png;base64,/, '')
-                      const buf = Buffer.from(base64Data, 'base64')
-                      const imagemin = (await import('imagemin')).default
-                      var img = await imagemin.buffer(buf, { plugins: [imageminPngquant()] })
-
+                      var base64Data = b64.replace(
+                        /^data:image\/png;base64,/,
+                        ""
+                      );
+                      const buf = Buffer.from(base64Data, "base64");
+                      const imagemin = (await import("imagemin")).default;
+                      var img = await imagemin.buffer(buf, {
+                        plugins: [imageminPngquant()],
+                      });
 
                       response.end(img);
                     })
@@ -216,11 +220,11 @@ function createImage(stringSplit, imageCaption, response) {
         "Content-Type": "image/png",
       });
 
-      var base64Data = b64.replace(/^data:image\/png;base64,/, '')
-      const buf = Buffer.from(base64Data, 'base64')
-      const imagemin = (await import('imagemin')).default
-      const imageminPngquant = require('imagemin-pngquant')
-      var img = await imagemin.buffer(buf, { plugins: [imageminPngquant()] })
+      var base64Data = b64.replace(/^data:image\/png;base64,/, "");
+      const buf = Buffer.from(base64Data, "base64");
+      const imagemin = (await import("imagemin")).default;
+      const imageminPngquant = require("imagemin-pngquant");
+      var img = await imagemin.buffer(buf, { plugins: [imageminPngquant()] });
 
       response.end(img);
     })
