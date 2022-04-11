@@ -8,6 +8,9 @@ const abi = JSON.parse(dataAbi);
 var nftResolverABI = fs.readFileSync("abi/NFTResolver.json");
 const NFTAbi = JSON.parse(nftResolverABI);
 
+var verifyResolverABI = fs.readFileSync("abi/VerifyResolver.json");
+const VerifyAbi = JSON.parse(verifyResolverABI);
+
 var NFTContrctDummyAbi = fs.readFileSync("abi/DummyERC721.json");
 const NFTDummyAbi = JSON.parse(NFTContrctDummyAbi);
 
@@ -30,7 +33,10 @@ const NFTResolver = new web3.eth.Contract(
   NFTAbi,
   "0xFFb32987c496364cd752cB196bFBE01D8D0D7e48"
 );
-
+const VerifyResolver = new web3.eth.Contract(
+  VerifyAbi,
+  "0xFFb32987c496364cd752cB196bFBE01D8D0D7e48"
+);
 const controller = new web3.eth.Contract(
   ControllerAbi,
   "0xBd295ab4BC7Cb4BDf4B7558B9d3f18C5Baee0AA5"
@@ -43,6 +49,31 @@ app.use(cors());
 
 app.get("/token/:token/", getToken);
 async function getToken(request, response) {
+  try {
+    await web3.eth.net.isListening();
+    callTokenData(request, response);
+  } catch (e) {
+    var data = {
+      status: "Error connecting to provider",
+    };
+    response.send(data);
+  }
+}
+
+app.get("/image/:image/", getImage);
+async function getImage(request, response) {
+  try {
+    await web3.eth.net.isListening();
+    callImage(request, response);
+  } catch (e) {
+    var data = {
+      status: "Error connecting to provider",
+    };
+    response.send(data);
+  }
+}
+
+async function callTokenData(request, response) {
   var tokenID = request.params.token;
   const checkAvailable = await ONS.methods.available(tokenID).call();
   if (checkAvailable === false) {
@@ -78,12 +109,9 @@ async function getToken(request, response) {
   }
   response.send(date);
 }
-
-app.get("/image/:image/", getImage);
-async function getImage(request, response) {
+async function callImage(request, response) {
   var tokenID = request.params.image;
   const checkAvailable = await ONS.methods.available(tokenID).call();
-
   if (checkAvailable === false) {
     const getName = await ONS.methods.getNamebyID(tokenID).call();
     var stringSplit = getName.split(".");
@@ -127,12 +155,27 @@ async function getImage(request, response) {
                       loadedImage = image;
                       let watermark = await Jimp.read(fileName);
                       image = image.resize(1500, 1500);
+
                       watermark = watermark.resize(1500, 1500); // Resizing watermark image
                       image.composite(watermark, 0, 0, {
                         mode: Jimp.BLEND_SOURCE_OVER,
                         opacityDest: 1,
                         opacitySource: 1,
                       });
+                      await VerifyResolver.methods
+                        .getNamebyID(checkVerify)
+                        .call()
+                        .then(async function (status) {
+                          if (status) {
+                            let verifyIcon = await Jimp.read("verified.png");
+                            verifyIcon = verifyIcon.resize(150, 150); // Resizing watermark image
+                            image.composite(verifyIcon, 0, 0, {
+                              mode: Jimp.BLEND_SOURCE_OVER,
+                              opacityDest: 1,
+                              opacitySource: 1,
+                            });
+                          }
+                        });
 
                       if (stringSplit[0].length <= 3) {
                         return Jimp.loadFont("font/font256.fnt");
@@ -183,7 +226,6 @@ async function getImage(request, response) {
       });
   }
 }
-
 function createImage(stringSplit, imageCaption, response) {
   var loadedImage;
   if (stringSplit[0].length === 1) {
@@ -202,6 +244,22 @@ function createImage(stringSplit, imageCaption, response) {
   Jimp.read(fileName)
     .then(async function (image) {
       loadedImage = image;
+
+      await VerifyResolver.methods
+        .getNamebyID(checkVerify)
+        .call()
+        .then(async function (status) {
+          if (status) {
+            let verifyIcon = await Jimp.read("verified.png");
+            verifyIcon = verifyIcon.resize(150, 150); // Resizing watermark image
+            image.composite(verifyIcon, 0, 0, {
+              mode: Jimp.BLEND_SOURCE_OVER,
+              opacityDest: 1,
+              opacitySource: 1,
+            });
+          }
+        });
+
       if (stringSplit[0].length <= 3) {
         return Jimp.loadFont("font/font256.fnt");
       } else if (stringSplit[0].length <= 13) {
