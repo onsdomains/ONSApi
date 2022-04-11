@@ -49,28 +49,30 @@ app.use(cors());
 
 app.get("/token/:token/", getToken);
 async function getToken(request, response) {
-  try {
-    await web3.eth.net.isListening();
-    callTokenData(request, response);
-  } catch (e) {
-    var data = {
-      status: "Error connecting to provider",
-    };
-    response.send(data);
-  }
+  web3.eth.getNodeInfo(function (error, data) {
+    if (!error) {
+      callTokenData(request, response);
+    } else {
+      var data = {
+        status: "Error connecting to provider",
+      };
+      response.send(data);
+    }
+  });
 }
 
 app.get("/image/:image/", getImage);
 async function getImage(request, response) {
-  try {
-    await web3.eth.net.isListening();
-    callImage(request, response);
-  } catch (e) {
-    var data = {
-      status: "Error connecting to provider",
-    };
-    response.send(data);
-  }
+  web3.eth.getNodeInfo(function (error, msg) {
+    if (!error) {
+      callImage(request, response);
+    } else {
+      var data = {
+        status: "Error connecting to provider",
+      };
+      response.send(data);
+    }
+  });
 }
 
 async function callTokenData(request, response) {
@@ -79,9 +81,21 @@ async function callTokenData(request, response) {
   if (checkAvailable === false) {
     const getName = await ONS.methods.getNamebyID(tokenID).call();
     const getExpireDate = await ONS.methods.nameExpires(tokenID).call();
+    let checkVerifyStatus;
+    await VerifyResolver.methods
+      .checkVerify(tokenID)
+      .call()
+      .then(function (data) {
+        checkVerifyStatus = data;
+      })
+      .catch(function (e) {
+        checkVerifyStatus = false;
+      });
+
     var stringSplit = getName.split(".");
     var date = {
       is_normalized: true,
+      verified: checkVerifyStatus,
       name: getName,
       symbol: "ONS",
       description: getName + " is an ONS name.",
@@ -163,11 +177,11 @@ async function callImage(request, response) {
                         opacitySource: 1,
                       });
                       await VerifyResolver.methods
-                        .getNamebyID(checkVerify)
+                        .checkVerify(tokenID)
                         .call()
                         .then(async function (status) {
                           if (status) {
-                            let verifyIcon = await Jimp.read("verified.png");
+                            let verifyIcon = await Jimp.read("bg/verified.png");
                             verifyIcon = verifyIcon.resize(150, 150); // Resizing watermark image
                             image.composite(verifyIcon, 0, 0, {
                               mode: Jimp.BLEND_SOURCE_OVER,
@@ -175,7 +189,8 @@ async function callImage(request, response) {
                               opacitySource: 1,
                             });
                           }
-                        });
+                        })
+                        .catch(function (err) {});
 
                       if (stringSplit[0].length <= 3) {
                         return Jimp.loadFont("font/font256.fnt");
@@ -209,24 +224,24 @@ async function callImage(request, response) {
                       response.end(img);
                     })
                     .catch(function (err) {
-                      createImage(stringSplit, imageCaption, response);
+                      createImage(tokenID, stringSplit, imageCaption, response);
                     });
                 });
               })
               .on("error", function (e) {
-                createImage(stringSplit, imageCaption, response);
+                createImage(tokenID, stringSplit, imageCaption, response);
               });
           })
           .catch(function (error) {
-            createImage(stringSplit, imageCaption, response);
+            createImage(tokenID, stringSplit, imageCaption, response);
           });
       })
       .catch(function (error) {
-        createImage(stringSplit, imageCaption, response);
+        createImage(tokenID, stringSplit, imageCaption, response);
       });
   }
 }
-function createImage(stringSplit, imageCaption, response) {
+function createImage(tokenID, stringSplit, imageCaption, response) {
   var loadedImage;
   if (stringSplit[0].length === 1) {
     var fileName = "bg/bg6.png";
@@ -244,13 +259,12 @@ function createImage(stringSplit, imageCaption, response) {
   Jimp.read(fileName)
     .then(async function (image) {
       loadedImage = image;
-
       await VerifyResolver.methods
-        .getNamebyID(checkVerify)
+        .checkVerify(tokenID)
         .call()
         .then(async function (status) {
           if (status) {
-            let verifyIcon = await Jimp.read("verified.png");
+            let verifyIcon = await Jimp.read("bg/verified.png");
             verifyIcon = verifyIcon.resize(150, 150); // Resizing watermark image
             image.composite(verifyIcon, 0, 0, {
               mode: Jimp.BLEND_SOURCE_OVER,
@@ -258,7 +272,8 @@ function createImage(stringSplit, imageCaption, response) {
               opacitySource: 1,
             });
           }
-        });
+        })
+        .catch(function (err) {});
 
       if (stringSplit[0].length <= 3) {
         return Jimp.loadFont("font/font256.fnt");
@@ -290,7 +305,6 @@ function createImage(stringSplit, imageCaption, response) {
       console.error(err);
     });
 }
-
 function timeConverter(UNIX_timestamp) {
   var a = new Date(UNIX_timestamp * 1000);
   var months = [
